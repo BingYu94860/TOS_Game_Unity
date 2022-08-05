@@ -26,8 +26,8 @@ public class PuzzleControl : MonoBehaviour {
     private bool touchState = false;
 
     /*
-    public float baseWidth = 720;       //開發時定義的基礎解析度 寬度
-    public float baseHeight = 1280;     //開發時定義的基礎解析度 高度
+    public float baseWidth = 720;       //開發時定義的基礎解析度 寬度 //540
+    public float baseHeight = 1280;     //開發時定義的基礎解析度 高度 //960
     private float baseAspect;           //開發時定義的基礎解析度 長寬比
     private float targetWidth;          //實際顯示畫面的解析度 寬度
     private float targetHeight;         //實際顯示畫面的解析度 高度
