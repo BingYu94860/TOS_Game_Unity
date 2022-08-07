@@ -1,10 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
-namespace Assets.Script {
+namespace Assets.Script
+{
     public enum OrbsType : sbyte { R, B, G, H, Null };
     public enum DIR : sbyte { RIGHT, RIGHT_DOWN, DOWN, LEFT_DOWN, LEFT, LEFT_UP, UP, RIGHT_UP, STOP};
     class TOS {
