@@ -2,8 +2,6 @@
 using UnityEngine;
 using UnityEngine.UI;
 using Assets.Script;
-//using System.Diagnostics;
-
 
 public class ComputeButton : MonoBehaviour {
     private PuzzleSystem puzzleSystem;//PuzzleSystem.cs

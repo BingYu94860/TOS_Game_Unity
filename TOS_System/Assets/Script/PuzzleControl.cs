@@ -146,65 +146,7 @@ public class PuzzleControl : MonoBehaviour {
                 break;
         }
     }
-    /*
-    //版面 對應轉換座標
-    Vector2 WorldToRect() {
-        Vector2 screenPoint = RectTransformUtility.WorldToScreenPoint(Camera.main, inputPos);
-        var x1 = screenPoint.x;
-        var y1 = screenPoint.y;
-        var xx = BGRect.sizeDelta.x;
-        var yy = BGRect.sizeDelta.y;
-        Debug.Log("\t\t\t Camera = " + Camera.main);
-        Debug.Log("\t\t\t screenPoint x = " + x1 + " , y = " + y1);
-        Debug.Log("\t\t\t BGRect x = " + xx + " , y = " + yy);
-        RectTransformUtility.ScreenPointToLocalPointInRectangle(BGRect, screenPoint, Camera.main, out Vector2 Pos);
-        return Pos;
-    }
 
-    public  Vector2 WorldToRect2() {
-        
-        //UIRoot root = GameObject.FindObjectOfType<UIRoot>();
-        //var h = (float)root.activeHeight;
-        //var w = (float)root.activeWidth;
-        //Debug.Log("\t\t\t 大小 w = " + f + " , h = " + w);
-        
-        Debug.Log("\t\t\t 螢幕大小 w = " + Screen.width + " , h = " + Screen.height + "\t| BGRect x = " + BGRect.sizeDelta.x + " , y = " + BGRect.sizeDelta.y);
-        Debug.Log("\t\t\t 輸入座標 x = " + Input.mousePosition.x + " , y = " + Input.mousePosition.y);
-        Vector2 v11 = Camera.main.WorldToScreenPoint(Input.mousePosition);
-        Vector2 v12 = Camera.main.ScreenToWorldPoint(Input.mousePosition);
-        Debug.Log("\t\t\t 世界to螢幕 x = " + v11.x + " , y = " + v11.y + "\t| 螢幕to世界 x = " + v12.x + " , y = " + v12.y);
-        Vector2 v21 = Camera.main.WorldToViewportPoint(Input.mousePosition);
-        Vector2 v22 = Camera.main.ViewportToWorldPoint(Input.mousePosition);
-        Debug.Log("\t\t\t 世界to視窗 x = " + v21.x + " , y = " + v21.y + "\t| 視窗to世界 x = " + v22.x + " , y = " + v22.y);
-        Vector2 v31 = Camera.main.ViewportToScreenPoint(Input.mousePosition);
-        Vector2 v32 = Camera.main.ScreenToViewportPoint(Input.mousePosition);
-        Debug.Log("\t\t\t 視窗to螢幕 x = " + v31.x + " , y = " + v31.y + "\t| 螢幕to視窗 x = " + v32.x + " , y = " + v32.y);
-
-        //世界to螢幕
-        Vector2 screenPoint = RectTransformUtility.WorldToScreenPoint(Camera.main, Input.mousePosition);
-        
-        Debug.Log("\t\t\t screenPoint x = " + screenPoint.x + " , y = " + screenPoint.y);
-        //Debug.Log("\t\t\t Get = " + GetComponentsInParents<Canvas>());
-        Vector2 Pos = Vector2.zero;
-        RectTransformUtility.ScreenPointToLocalPointInRectangle(BGRect, screenPoint, Camera.main, out Pos);
-        Debug.Log("\t\t\t Pos x = " + Pos.x + " , y = " + Pos.y);
-        return Pos;
-    }
-    */
-    /*
-    public static Vector3 WorldToScreenPoint(Vector3 SetWorldPostion) {
-        //Vector2 UICameraPostion = Vector2.zero;  // 先宣告一個回傳Vector2.
-        RectTransform CanvasRectTransform = m_CanvasObj.GetComponent();  // 取得Canvas的RectTransform.
-        Vector2 ScreenPos = RectTransformUtility.WorldToScreenPoint(Camera.main, SetWorldPostion);
-        // 將照射3D物件的社Camera指定進去， 並將要轉換的3D座標輸入進去
-        // 就可以得到3D Camera轉換為該Space下的Screen Space.
-
-        RectTransformUtility.ScreenPointToLocalPointInRectangle(CanvasRectTransform, ScreenPos, UICamera, out Vector2 UICameraPostion);
-        // 最後用這個API將Screen Space轉換為UGUI的座標，分別將UI Canvas的RectTransform傳入
-        // 後面依序是要轉換的ScreenPostion跟UI Camera以及輸到到那一個變數.　
-
-        return UICameraPostion;
-    }*/
     void Update() {
         //Debug.Log("\t\t\t\t\t【Update】");
         statusText.text = "狀態:" + stateString[(int)state];
