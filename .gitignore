@@ -1,6 +1,6 @@
 
 /TOS_System/[Ll]ibrary/*
-
+/TOS_System/[Ll]ogs/*
 
 
 # This .gitignore file should be placed at the root of your Unity project directory
