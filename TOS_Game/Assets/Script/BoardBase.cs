@@ -82,15 +82,13 @@ public class BoardBase : MonoBehaviour
     }
 
     protected List<List<(int r, int c)>> FindSingleMatches(BeadType[,] beadType2d, bool[,] canRemove2d)
-    {
+    {   // Flood fill
         var isRemove2d = (bool[,])canRemove2d.Clone();
         var ROWS = beadType2d.GetLength(0);
         var COLS = beadType2d.GetLength(1);
-        // Flood fill
         var matches = new List<List<(int r, int c)>>();
         for (var ir = 0; ir < ROWS; ir++) //y ROWS=5
-        {
-            for (var ic = 0; ic < COLS; ic++) //x COLS=6
+        {   for (var ic = 0; ic < COLS; ic++) //x COLS=6
             {
                 if (isRemove2d[ir, ic] == false) continue;
                 // 以下 canRemove2d[r, c] 皆是標記可移除的
@@ -102,7 +100,7 @@ public class BoardBase : MonoBehaviour
                 {
                     var p = stack.Pop();
                     if (beadType2d[p.r, p.c] != orb_cur || isRemove2d[p.r, p.c] == false) continue;
-                    // 以下 orb2d[p.r, p.c] 皆是同珠色, canRemove2d[p.r, p.c] 皆是標記可移除的
+                    // 以下 beadType2d[p.r, p.c] 皆是同珠色, canRemove2d[p.r, p.c] 皆是標記可移除的
                     matche.Add(p);
                     isRemove2d[p.r, p.c] = false;
                     // 將上下左右的4個位置加入stack
