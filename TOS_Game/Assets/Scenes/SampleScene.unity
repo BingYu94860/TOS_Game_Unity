@@ -1010,6 +1010,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 816bb62700d10264d8964a62f0249559, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  BGRect: {fileID: 325184599}
+  finger: {fileID: 1789895121}
+  beads: []
   inputFieldMaxPath: {fileID: 1007356698}
   inputFieldIterationNun: {fileID: 1957340942}
   inputFieldGroupSize: {fileID: 702165369}
@@ -1017,12 +1020,11 @@ MonoBehaviour:
   inputFieldLimitStep: {fileID: 1634555603}
   roadText: {fileID: 1489082636}
   toggle: {fileID: 509393531}
-  BGRect: {fileID: 325184599}
-  finger: {fileID: 1789895121}
-  beads: []
+  btnText: {fileID: 321188583}
   removeTimer: 0
   removeTotalTime: 0
   removeUnitTime: 0.1
+  scoreText: {fileID: 515327368}
   fallTimer: 0
   fallTotalTime: 0
   fallUnitTime: 0.1
@@ -3482,7 +3484,7 @@ MonoBehaviour:
   width: 90
   height: 90
   init_pos: {x: 0, y: 0}
-  _beadType: 0
+  _beadType: 6
   _opacity: 1
   state: 0
   timerText: {fileID: 295350277}

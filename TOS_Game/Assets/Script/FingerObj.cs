@@ -9,9 +9,9 @@ public enum FingerRunStates : int { Idle, Touch, Auto };
 public class FingerObj : BeadBase
 {
     [SerializeField] FingerRunStates state = FingerRunStates.Idle;
-    public Text timerText; //畫面第4行 //剩餘時間
-    public Text positionText; //畫面第5-1行 //轉珠位置
-    public Text pathText; //畫面第5-2行 //已走步數
+    public Text timerText; 
+    public Text positionText;
+    public Text pathText; 
 
     #region 自動演示移動
     [SerializeField] private float autoStepTimer = 0.0f;
@@ -157,7 +157,7 @@ public class FingerObj : BeadBase
         {
             case FingerRunStates.Auto:
                 autoStepTimer += Time.deltaTime;
-                if (autoStepTimer > 0.5f)
+                if (autoStepTimer > 0.2f)
                 {
                     autoStepTimer = 0.0f;
                     autoStepCount += 1;

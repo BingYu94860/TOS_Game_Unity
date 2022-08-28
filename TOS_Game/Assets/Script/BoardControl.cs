@@ -11,6 +11,12 @@ public enum BoardRunStates : int { Idle, Remove, Fall };
 public class BoardControl : BoardBase
 {
     BoardRunStates state = BoardRunStates.Idle;
+    public RectTransform BGRect;
+    public FingerObj finger;
+    [SerializeField] static int ROWS = 5;
+    [SerializeField] static int COLS = 6;
+    [SerializeField] List<BeadObj> beads = null;
+    [SerializeField] BeadObj[,] board = null;
 
     #region Button Click
     string saveDataStr = null;
@@ -56,88 +62,109 @@ public class BoardControl : BoardBase
     public InputField inputFieldLimitStep;
     public Text roadText;
     public Toggle toggle;
-
+    bool isRun = false;
     string printStr = "";
     public void ComputeButtonClick()
     {
-        this.board = GetBoardLinkBeads(beads, ROWS, COLS);
-        Debug.Log("Compute Button Click");
+        if (isRun == false)
+        {
+            this.board = GetBoardLinkBeads(beads, ROWS, COLS);
+            Debug.Log("Compute Button Click");
 
-        if (!int.TryParse(inputFieldMaxPath.text, out SolveBoard2.MAX_PATH) || SolveBoard2.MAX_PATH <= 0)
-        {
-            SolveBoard2.MAX_PATH = 50;
-            inputFieldMaxPath.text = "50";
-        }
-        if (!int.TryParse(inputFieldIterationNun.text, out SolveBoard2.ITERATION_NUM) || SolveBoard2.ITERATION_NUM <= 0)
-        {
-            SolveBoard2.ITERATION_NUM = 100;
-            inputFieldIterationNun.text = "100";
-        }
-        if (!int.TryParse(inputFieldGroupSize.text, out SolveBoard2.GROUP_SIZE) || SolveBoard2.GROUP_SIZE <= 0)
-        {
-            SolveBoard2.GROUP_SIZE = 1000;
-            inputFieldGroupSize.text = "1000";
-        }
-        if (!int.TryParse(inputFieldBatchSize.text, out SolveBoard2.BATCH_SIZE) || SolveBoard2.BATCH_SIZE <= 0)
-        {
-            SolveBoard2.BATCH_SIZE = 100;
-            inputFieldBatchSize.text = "100";
-        }
-        else if (SolveBoard2.BATCH_SIZE > SolveBoard2.GROUP_SIZE)
-        {
-            SolveBoard2.BATCH_SIZE = SolveBoard2.GROUP_SIZE;
-            inputFieldBatchSize.text = SolveBoard2.BATCH_SIZE.ToString();
-        }
-        if (!int.TryParse(inputFieldLimitStep.text, out SolveBoard2.LIMIT_STEP) || SolveBoard2.LIMIT_STEP <= 0)
-        {
-            SolveBoard2.LIMIT_STEP = 8;
-            inputFieldLimitStep.text = "8";
-        }
-        else if (SolveBoard2.LIMIT_STEP > SolveBoard2.MAX_PATH)
-        {
-            SolveBoard2.LIMIT_STEP = SolveBoard2.MAX_PATH;
-            inputFieldLimitStep.text = SolveBoard2.LIMIT_STEP.ToString();
-        }
-        OrbsType[,] board = new OrbsType[TOS.ROWS, TOS.COLS];
-        for (int i = 0; i < TOS.ROWS; i++)
-        {
-            for (int j = 0; j < TOS.COLS; j++)
+            if (!int.TryParse(inputFieldMaxPath.text, out SolveBoard2.MAX_PATH) || SolveBoard2.MAX_PATH <= 0)
             {
-                //Debug.Log("this.board[" + i + "," + j +  "].beadType = " + this.board[i, j].beadType);
-                board[i, j] = (OrbsType)(int)this.board[i, j].beadType;
+                SolveBoard2.MAX_PATH = 50;
+                inputFieldMaxPath.text = "50";
             }
+            if (!int.TryParse(inputFieldIterationNun.text, out SolveBoard2.ITERATION_NUM) || SolveBoard2.ITERATION_NUM <= 0)
+            {
+                SolveBoard2.ITERATION_NUM = 100;
+                inputFieldIterationNun.text = "100";
+            }
+            if (!int.TryParse(inputFieldGroupSize.text, out SolveBoard2.GROUP_SIZE) || SolveBoard2.GROUP_SIZE <= 0)
+            {
+                SolveBoard2.GROUP_SIZE = 1000;
+                inputFieldGroupSize.text = "1000";
+            }
+            if (!int.TryParse(inputFieldBatchSize.text, out SolveBoard2.BATCH_SIZE) || SolveBoard2.BATCH_SIZE <= 0)
+            {
+                SolveBoard2.BATCH_SIZE = 100;
+                inputFieldBatchSize.text = "100";
+            }
+            else if (SolveBoard2.BATCH_SIZE > SolveBoard2.GROUP_SIZE)
+            {
+                SolveBoard2.BATCH_SIZE = SolveBoard2.GROUP_SIZE;
+                inputFieldBatchSize.text = SolveBoard2.BATCH_SIZE.ToString();
+            }
+            if (!int.TryParse(inputFieldLimitStep.text, out SolveBoard2.LIMIT_STEP) || SolveBoard2.LIMIT_STEP <= 0)
+            {
+                SolveBoard2.LIMIT_STEP = 8;
+                inputFieldLimitStep.text = "8";
+            }
+            else if (SolveBoard2.LIMIT_STEP > SolveBoard2.MAX_PATH)
+            {
+                SolveBoard2.LIMIT_STEP = SolveBoard2.MAX_PATH;
+                inputFieldLimitStep.text = SolveBoard2.LIMIT_STEP.ToString();
+            }
+            OrbsType[,] board = new OrbsType[TOS.ROWS, TOS.COLS];
+            for (int i = 0; i < TOS.ROWS; i++)
+            {
+                for (int j = 0; j < TOS.COLS; j++)
+                {
+                    //Debug.Log("this.board[" + i + "," + j +  "].beadType = " + this.board[i, j].beadType);
+                    board[i, j] = (OrbsType)(int)this.board[i, j].beadType;
+                }
+            }
+            var solveBoard = new SolveBoard2(board);
+            // 以下用於計算執行時間
+            System.Diagnostics.Stopwatch time = new System.Diagnostics.Stopwatch();
+            time.Start();
+            solveBoard.Run(); //用於找出相對最佳轉珠轉珠路徑
+            time.Stop();
+            Debug.Log("執行 " + time.Elapsed.TotalSeconds + " 秒");
+            // 以上用於計算執行時間
+            var best = solveBoard.bestSolution;
+            row = best.init.row;
+            col = best.init.col;
+            pathStr = best.GetPathString();
+            var (combos, weight) = Compute.Result(best.turn.board);
+            string comboStr = "Combo: " + combos.Count + " | ";
+            foreach (var (type, count) in combos)
+                comboStr += (type.ToString() + count.ToString() + " ");
+            comboStr += "\n";
+
+            Debug.Log("\t\t\t(" + row + ", " + col + ") : " + pathStr + " weight = " + weight);
+            Debug.Log("\t\t\t MaxScore = " + Compute.GetMaxScore(best.init.board));
+            var searchCount = SolveBoard2.searchCount;
+            var endCount = SolveBoard2.endCount;
+            var deleteCount1 = SolveBoard2.deleteCount1;
+            var deleteCount2 = SolveBoard2.deleteCount2;
+            var deleteCount3 = SolveBoard2.deleteCount3;
+            var nn = searchCount - endCount - deleteCount1 - deleteCount2;
+            var str = "" + searchCount + "=" + endCount + "+(" + deleteCount1 + "+" + deleteCount2 + "+" + deleteCount3 + ")+" + nn;
+
+            printStr = ("執行 " + time.Elapsed.TotalSeconds + " 秒\n" + "起始位置(x,y) = (" + col + ", " + row + ")\n");
+            printStr += ("路徑(" + pathStr.Length + "): " + pathStr + "\n");
+            printStr += ("得分: " + weight + "\n");
+            printStr += comboStr + str;
+
+            btnText.text = "開始轉珠";
+            scoreText.text = "???分 ";
         }
-        var solveBoard = new SolveBoard2(board);
-        solveBoard.Run();
-        var best = solveBoard.bestSolution;
-        var row = best.init.row;
-        var col = best.init.col;
-        var pathStr = best.GetPathString();
-        var (combos, weight) = Compute.Result(best.turn.board);
-        string comboStr = "Combo: " + combos.Count + " | ";
-        foreach (var (type, count) in combos)
-            comboStr += (type.ToString() + count.ToString() + " ");
-        comboStr += "\n";
-
-        Debug.Log("\t\t\t(" + row + ", " + col + ") : " + pathStr + " weight = " + weight);
-        Debug.Log("\t\t\t MaxScore = " + Compute.GetMaxScore(best.init.board));
-        var searchCount = SolveBoard2.searchCount;
-        var endCount = SolveBoard2.endCount;
-        var deleteCount1 = SolveBoard2.deleteCount1;
-        var deleteCount2 = SolveBoard2.deleteCount2;
-        var deleteCount3 = SolveBoard2.deleteCount3;
-        var nn = searchCount - endCount - deleteCount1 - deleteCount2;
-        var str = "" + searchCount + "=" + endCount + "+(" + deleteCount1 + "+" + deleteCount2 + "+" + deleteCount3 + ")+" + nn;
-
-        printStr = ("起始位置(x,y) = (" + col + ", " + row + ")\n");
-        printStr += ("路徑(" + pathStr.Length + "): " + pathStr + "\n");
-        printStr += ("得分: " + weight + "\n");
-        printStr += comboStr + str;
-        finger.RunAutoStart(this.board[row, col], new Vector2Int(col, row), pathStr);
+        else
+        {
+            finger.RunAutoStart(this.board[row, col], new Vector2Int(col, row), pathStr);
+            btnText.text = "計算路徑";
+        }
+        isRun = !isRun;
     }
+    public Text btnText;
+    string pathStr = "";
+    int row = 0;
+    int col = 0;
     #endregion
 
-    #region 
+    #region OnToggleChangeValue
     public void OnToggleChangeValue()
     {
         if (toggle.isOn)
@@ -158,25 +185,6 @@ public class BoardControl : BoardBase
         }
     }
     #endregion
-
-
-    public RectTransform BGRect;
-    public FingerObj finger;
-    [SerializeField] static int ROWS = 5;
-    [SerializeField] static int COLS = 6;
-    [SerializeField] List<BeadObj> beads = null;
-    [SerializeField] BeadObj[,] board = null;
-
-    void Start()
-    {
-        beads = GetCreateBeadsInRect(BGRect, ROWS, COLS);
-
-        board = GetBoardLinkBeads(beads, ROWS, COLS);
-
-        ComboStart();
-        toggle.isOn = false;
-        
-    }
 
     #region ComboStart & RemoveAnimation
     //[SerializeField] BeadType[,] beadType2d = null;
@@ -204,9 +212,12 @@ public class BoardControl : BoardBase
         }
         else ComboEnd();
     }
-
+    public const float MULTI_ORB_BONUS = 0.25f;
+    public const float COMBO_BONUS = 0.25f;
+    public Text scoreText;
     private void RemoveAnimation(BeadObj[,] board, List<List<(int r, int c)>> matches, float removeUnitTime)
     {   // 執行整個版面 消除動畫 // removeTotalTime = removeUnitTime * matches.Count;
+        var point = 0.0f;
         for (var icombo = 0; icombo < matches.Count; icombo++)
         {
             for (var inum = 0; inum < matches[icombo].Count; inum++)
@@ -214,7 +225,10 @@ public class BoardControl : BoardBase
                 var (ir, ic) = matches[icombo][inum];
                 board[ir, ic].removeAnimation(icombo, matches.Count, removeUnitTime);
             }
+            point += (100f) * (1f + ((matches[icombo].Count - 3) * MULTI_ORB_BONUS));//計消珠分
         }
+        point *= (1f + ((matches.Count - 1f) * COMBO_BONUS));//計combo分
+        scoreText.text = "" + point + "分 ";
     }
     #endregion
 
@@ -274,8 +288,14 @@ public class BoardControl : BoardBase
         state = BoardRunStates.Idle;
     }
 
-
-    // Update is called once per frame
+    #region Start() 和 Update()
+    void Start()
+    {
+        beads = GetCreateBeadsInRect(BGRect, ROWS, COLS);
+        board = GetBoardLinkBeads(beads, ROWS, COLS);
+        ComboStart();
+        toggle.isOn = false;
+    }
     void Update()
     {
         if (state == BoardRunStates.Remove)
@@ -293,17 +313,12 @@ public class BoardControl : BoardBase
             fallTimer += Time.deltaTime;
             if (fallTimer > fallTotalTime)
             {
-                state = BoardRunStates.Remove;
-                ComboStart();
+                //state = BoardRunStates.Remove; // 疊珠
+                //ComboStart(); // 疊珠
+                state = BoardRunStates.Idle; // 不疊珠
             }
         }
-
-
-
-
-
         roadText.text = printStr;
-
-
     }
+    #endregion
 }

@@ -118,5 +118,4 @@ public class BoardBase : MonoBehaviour
         }
         return matches;
     }
-
 }
