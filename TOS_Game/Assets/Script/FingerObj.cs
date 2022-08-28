@@ -145,12 +145,14 @@ public class FingerObj : BeadBase
         state = FingerRunStates.Idle;
         SetInitPosition(-1, -1);
     }
+    public Slider m_Slider;
     void Update()
     {
         timerText.text = "剩餘時間:" + (turnMaxTime - turnTimer).ToString("00.00") + "秒";
-        pathText.text = "已走" + (touchCount - 1) + "步";
-        positionText.text = "位置:" + (touchBeadObj != null ? "(" + touchBeadObj.init_pos.x + ", " + touchBeadObj.init_pos.y + ")" : "(?, ?)");
-
+        pathText.text = "已走 " + ((touchCount > 1) ? (touchCount - 1) : 0) + " 步";
+        positionText.text = " 位置:" + (touchBeadObj != null ? "(" + touchBeadObj.init_pos.x + ", " + touchBeadObj.init_pos.y + ")" : "(?, ?)");
+        m_Slider.value = (turnMaxTime - turnTimer)/turnMaxTime;
+        
         switch (state)
         {
             case FingerRunStates.Auto:

@@ -137,13 +137,36 @@ public class BoardControl : BoardBase
     }
     #endregion
 
+    #region 
+    public void OnToggleChangeValue()
+    {
+        if (toggle.isOn)
+        {
+            inputFieldMaxPath.GetComponent<RectTransform>().sizeDelta = new Vector2(108, 30);
+            inputFieldIterationNun.GetComponent<RectTransform>().sizeDelta = new Vector2(108, 30);
+            inputFieldGroupSize.GetComponent<RectTransform>().sizeDelta = new Vector2(108, 30);
+            inputFieldBatchSize.GetComponent<RectTransform>().sizeDelta = new Vector2(108, 30);
+            inputFieldLimitStep.GetComponent<RectTransform>().sizeDelta = new Vector2(108, 30);
+        }
+        else
+        {
+            inputFieldMaxPath.GetComponent<RectTransform>().sizeDelta = new Vector2(0, 0);
+            inputFieldIterationNun.GetComponent<RectTransform>().sizeDelta = new Vector2(0, 0);
+            inputFieldGroupSize.GetComponent<RectTransform>().sizeDelta = new Vector2(0, 0);
+            inputFieldBatchSize.GetComponent<RectTransform>().sizeDelta = new Vector2(0, 0);
+            inputFieldLimitStep.GetComponent<RectTransform>().sizeDelta = new Vector2(0, 0);
+        }
+    }
+    #endregion
+
+
     public RectTransform BGRect;
     public FingerObj finger;
     [SerializeField] static int ROWS = 5;
     [SerializeField] static int COLS = 6;
     [SerializeField] List<BeadObj> beads = null;
     [SerializeField] BeadObj[,] board = null;
-    
+
     void Start()
     {
         beads = GetCreateBeadsInRect(BGRect, ROWS, COLS);
@@ -151,6 +174,8 @@ public class BoardControl : BoardBase
         board = GetBoardLinkBeads(beads, ROWS, COLS);
 
         ComboStart();
+        toggle.isOn = false;
+        
     }
 
     #region ComboStart & RemoveAnimation
@@ -278,24 +303,7 @@ public class BoardControl : BoardBase
 
 
         roadText.text = printStr;
-        if (toggle.isOn)
-        {
-            inputFieldMaxPath.GetComponent<RectTransform>().sizeDelta = new Vector2(108, 30);
-            inputFieldIterationNun.GetComponent<RectTransform>().sizeDelta = new Vector2(108, 30);
-            inputFieldGroupSize.GetComponent<RectTransform>().sizeDelta = new Vector2(108, 30);
-            inputFieldBatchSize.GetComponent<RectTransform>().sizeDelta = new Vector2(108, 30);
-            inputFieldLimitStep.GetComponent<RectTransform>().sizeDelta = new Vector2(108, 30);
-        }
-        else
-        {
-            /*
-            inputFieldMaxPath.GetComponent<RectTransform>().sizeDelta = new Vector2(0, 0);
-            inputFieldIterationNun.GetComponent<RectTransform>().sizeDelta = new Vector2(0, 0);
-            inputFieldGroupSize.GetComponent<RectTransform>().sizeDelta = new Vector2(0, 0);
-            inputFieldBatchSize.GetComponent<RectTransform>().sizeDelta = new Vector2(0, 0);
-            inputFieldLimitStep.GetComponent<RectTransform>().sizeDelta = new Vector2(0, 0);
-            */
-        }
+
 
     }
 }
