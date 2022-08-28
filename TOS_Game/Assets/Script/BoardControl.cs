@@ -7,9 +7,11 @@ using UnityEngine.EventSystems;
 using System.IO;
 using Assets.Script;
 
-
+public enum BoardRunStates : int { Idle, Remove, Fall };
 public class BoardControl : BoardBase
 {
+    BoardRunStates state = BoardRunStates.Idle;
+
     #region Button Click
     string saveDataStr = null;
     public void SaveButtonClick()
@@ -131,7 +133,7 @@ public class BoardControl : BoardBase
         printStr += ("路徑(" + pathStr.Length + "): " + pathStr + "\n");
         printStr += ("得分: " + weight + "\n");
         printStr += comboStr + str;
-        finger.RunAuto(new Vector2Int(col, row), pathStr);
+        finger.RunAutoStart(this.board[row, col], new Vector2Int(col, row), pathStr);
     }
     #endregion
 
@@ -141,13 +143,7 @@ public class BoardControl : BoardBase
     [SerializeField] static int COLS = 6;
     [SerializeField] List<BeadObj> beads = null;
     [SerializeField] BeadObj[,] board = null;
-    [SerializeField] BeadType[,] beadType2d = null;
-    [SerializeField] bool[,] canRemove2d = null;
-    [SerializeField] List<List<(int r, int c)>> matches = null;
-    [SerializeField] float removeTotalTime;
-    [SerializeField] float removeUnitTime = 0.1f;
-    [SerializeField] float fallTotalTime;
-    [SerializeField] float fallUnitTime = 0.1f;
+    
     void Start()
     {
         beads = GetCreateBeadsInRect(BGRect, ROWS, COLS);
@@ -157,17 +153,35 @@ public class BoardControl : BoardBase
         ComboStart();
     }
 
+    #region ComboStart & RemoveAnimation
+    //[SerializeField] BeadType[,] beadType2d = null;
+    [SerializeField] bool[,] canRemove2d = null;
+    //[SerializeField] List<List<(int r, int c)>> matches = null;
+    [SerializeField] float removeTimer;
+    [SerializeField] float removeTotalTime;
+    [SerializeField] float removeUnitTime = 0.1f;
     public void ComboStart()
     {
         // 更新 board
         board = GetBoardLinkBeads(beads, ROWS, COLS);
         // 複製 beadType
-        beadType2d = GetBeadType2d(board);
+        BeadType[,] beadType2d = GetBeadType2d(board);
         canRemove2d = FindCanRemove2d(beadType2d);
         // 計算 各combo有哪需要消除的珠子
-        matches = FindSingleMatches(beadType2d, canRemove2d);
+        List<List<(int r, int c)>> matches = FindSingleMatches(beadType2d, canRemove2d);
         // 移除動畫 第幾個消除 總共多少個消除
+        RemoveAnimation(board, matches, removeUnitTime);
         removeTotalTime = removeUnitTime * matches.Count;
+        if (removeTotalTime != 0.0f)
+        {
+            state = BoardRunStates.Remove;
+            removeTimer = 0.0f;
+        }
+        else ComboEnd();
+    }
+
+    private void RemoveAnimation(BeadObj[,] board, List<List<(int r, int c)>> matches, float removeUnitTime)
+    {   // 執行整個版面 消除動畫 // removeTotalTime = removeUnitTime * matches.Count;
         for (var icombo = 0; icombo < matches.Count; icombo++)
         {
             for (var inum = 0; inum < matches[icombo].Count; inum++)
@@ -176,12 +190,14 @@ public class BoardControl : BoardBase
                 board[ir, ic].removeAnimation(icombo, matches.Count, removeUnitTime);
             }
         }
-        if (removeTotalTime != 0.0f)
-            Invoke("FallAnimation", removeTotalTime);
-        else ComboEnd();
     }
+    #endregion
 
-    void FallAnimation()
+    #region FallAnimation
+    [SerializeField] float fallTimer;
+    [SerializeField] float fallTotalTime;
+    [SerializeField] float fallUnitTime = 0.1f;
+    private void FallAnimation()
     {
         // 計算各直行 保留&消除 的珠子有哪些
         var fallKeeps = new List<List<int>>();
@@ -200,7 +216,7 @@ public class BoardControl : BoardBase
                 maxLineRemoveNum = fallRemoves[ic].Count;
         }
         fallTotalTime = fallUnitTime * maxLineRemoveNum;
-        Debug.Log("fallTotalTime=" + fallTotalTime);
+        //Debug.Log("fallTotalTime=" + fallTotalTime);
         for (var ic = 0; ic < COLS; ic++) //x COLS=6
         {
             if (fallRemoves[ic].Count == 0) continue;
@@ -223,20 +239,44 @@ public class BoardControl : BoardBase
                 dest_row += 1;
             }
         }
-        if (fallTotalTime != 0.0f)
-            Invoke("ComboStart", fallTotalTime);
-        //else ComboEnd();
     }
+
+    #endregion
 
     public void ComboEnd()
     {
-        Debug.Log("ComboEnd");
+        //Debug.Log("ComboEnd");
+        state = BoardRunStates.Idle;
     }
 
 
     // Update is called once per frame
     void Update()
     {
+        if (state == BoardRunStates.Remove)
+        {
+            removeTimer += Time.deltaTime;
+            if (removeTimer > removeTotalTime)
+            {
+                state = BoardRunStates.Fall;
+                FallAnimation();
+                fallTimer = 0.0f;
+            }
+        }
+        else if (state == BoardRunStates.Fall)
+        {
+            fallTimer += Time.deltaTime;
+            if (fallTimer > fallTotalTime)
+            {
+                state = BoardRunStates.Remove;
+                ComboStart();
+            }
+        }
+
+
+
+
+
         roadText.text = printStr;
         if (toggle.isOn)
         {

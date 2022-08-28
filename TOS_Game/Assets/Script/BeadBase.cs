@@ -12,6 +12,12 @@ public class BeadBase : MonoBehaviour
     {   // 假設 UI座標 和 世界座標 的原點都一樣
         Vector2 position1 = GetComponent<RectTransform>().anchoredPosition; //UI 座標
         Vector2 position2 = GetComponent<RectTransform>().position; // 世界座標
+        /*Debug.Log(
+        " name=" + name +
+        " transform.position=" + transform.position +
+        " transform.localPosition=" + transform.localPosition +
+        " RectTransform.anchoredPosition=" +  GetComponent<RectTransform>().anchoredPosition +
+        " RectTransform.position=" +  GetComponent<RectTransform>().position);*/
         zoom = position2 / position1;
     }
     #endregion
@@ -29,7 +35,7 @@ public class BeadBase : MonoBehaviour
 
     #region 初始座標定義
     [SerializeField] protected internal Vector2Int init_pos = Vector2Int.zero;
-    private protected Vector3 InitPosition => GetPosition(init_pos.x, init_pos.y);
+    public Vector3 InitPosition => GetPosition(init_pos.x, init_pos.y);
     public void SetInitPosition(int x, int y)
     {
         init_pos = new Vector2Int(x, y);

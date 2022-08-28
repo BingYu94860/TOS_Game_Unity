@@ -65,9 +65,9 @@ public class BeadObj : BeadBase, IPointerDownHandler, IPointerUpHandler
         beadType = beadObj.beadType; //me <- other
         beadObj.beadType = temp_beadType; //other <- me
         //交換 珠子不透明度
-        var temp_opacity = opacity;
-        opacity = beadObj.opacity;
-        beadObj.opacity = temp_opacity;
+        //var temp_opacity = opacity;
+        //opacity = beadObj.opacity;
+        //beadObj.opacity = temp_opacity;
         //交換 移除狀態
         if (removeFlag != beadObj.removeFlag)
         {
@@ -134,13 +134,13 @@ public class BeadObj : BeadBase, IPointerDownHandler, IPointerUpHandler
     {   // ex: destBeadObj.copyInPreprocess(srcBeadObj);
         srcBeadObj = src_beadObj;
         srcBeadData.beadType = src_beadObj.beadType;
-        srcBeadData.opacity = src_beadObj.opacity;
+        //srcBeadData.opacity = src_beadObj.opacity;
     }
     protected void copyInRun()
     {   // ex: destBeadObj.copyInRun(); // destBeadObj <= srcBeadObj
         srcBeadObj = null;
         beadType = srcBeadData.beadType;
-        opacity = srcBeadData.opacity;
+        //opacity = srcBeadData.opacity;
     }
 
 
@@ -153,8 +153,23 @@ public class BeadObj : BeadBase, IPointerDownHandler, IPointerUpHandler
 
     #region 判斷滑鼠按下與彈起
     [SerializeField] private FingerObj finger;
-    public void OnPointerDown(PointerEventData eventData) => finger.TurnStart(this);
+    public void OnPointerDown(PointerEventData eventData) => finger.RunTurnStart(this);
     public void OnPointerUp(PointerEventData eventData) => finger.TurnEnd();
+    #endregion
+
+    #region 控制碰撞
+    void OnTriggerEnter2D(Collider2D other)
+    {
+        if (!other.CompareTag("FingerObj")) return;
+        var fingerBeadObj = other.GetComponent<FingerObj>();
+        //opacity = 0.0f; //不穩定會閃爍
+    }
+    void OnTriggerExit2D(Collider2D other)
+    {
+        if (!other.CompareTag("FingerObj")) return;
+        var fingerBeadObj = other.GetComponent<FingerObj>();
+        //opacity = 1.0f; //不穩定會閃爍
+    }
     #endregion
 
     #region Start() 和 Update()
@@ -225,17 +240,3 @@ public class BeadObj : BeadBase, IPointerDownHandler, IPointerUpHandler
     }
     #endregion
 }
-
-
-/*
-void OnTriggerEnter2D(Collider2D other)
-{
-    if (!other.CompareTag("FingerObj")) return;
-    var fingerBeadObj = other.GetComponent<FingerObj>();
-}
-void OnTriggerExit2D(Collider2D other)
-{
-    if (!other.CompareTag("FingerObj")) return;
-    var fingerBeadObj = other.GetComponent<FingerObj>();
-}
-*/
