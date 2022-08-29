@@ -26,7 +26,8 @@ public class FingerObj : BeadBase
         state = FingerRunStates.Auto;
         Debug.Log("RunAuto ");
         // 移動位置 & 改變起手珠色
-        transform.position = beadObj.InitPosition;
+
+        SetWorldPosition(beadObj.InitPosition);
         beadType = beadObj.beadType;
         // 計算接下來的路徑位子的列表
         autoPosPathList = GetPosPathList(pos, pathStr);
@@ -80,7 +81,8 @@ public class FingerObj : BeadBase
         state = FingerRunStates.Touch;
         Debug.Log("TurnStart " + beadObj.name);
         // 移動位置 & 改變起手珠色
-        transform.position = Input.mousePosition;
+    
+        SetWorldPosition(Input.mousePosition);
         beadType = beadObj.beadType;
         // 參數重置
         touchCount = 0;
@@ -175,7 +177,8 @@ public class FingerObj : BeadBase
                 }
                 break;
             case FingerRunStates.Touch:
-                transform.position = Input.mousePosition;
+                
+                SetWorldPosition(Input.mousePosition);
                 if (touchCount > 1 && turnTimer < turnMaxTime)
                 {
                     turnTimer += Time.deltaTime;

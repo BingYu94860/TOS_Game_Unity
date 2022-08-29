@@ -102,7 +102,8 @@ public class BeadObj : BeadBase, IPointerDownHandler, IPointerUpHandler
         timer = 0.0f;
         state = BeadRunStates.Fall;
 
-        transform.position = GetPosition(init_pos.x, start_y); // 移動到落下點
+
+        SetWorldPosition(GetPosition(init_pos.x, start_y));// 移動到落下點
         if (removeFlag == true) CreateNewRandomBead(); //  如果是被標記移除的，重新生成。
 
         var fallDistance = Vector3.Distance(transform.position, dist_beadObj.InitPosition);
@@ -158,6 +159,7 @@ public class BeadObj : BeadBase, IPointerDownHandler, IPointerUpHandler
     #endregion
 
     #region 控制碰撞
+    /*
     void OnTriggerEnter2D(Collider2D other)
     {
         if (!other.CompareTag("FingerObj")) return;
@@ -170,6 +172,7 @@ public class BeadObj : BeadBase, IPointerDownHandler, IPointerUpHandler
         var fingerBeadObj = other.GetComponent<FingerObj>();
         //opacity = 1.0f; //不穩定會閃爍
     }
+    */
     #endregion
 
     #region Start() 和 Update()
@@ -180,6 +183,35 @@ public class BeadObj : BeadBase, IPointerDownHandler, IPointerUpHandler
         //SetZoom(); //控制縮放比例
 
         moveUnitTime = 0.1f;
+        var b0 = transform.parent.gameObject.transform.parent.gameObject; // 畫布
+        var b1 = transform.parent.gameObject; // 背景
+
+        var n0 = b0.name; // 畫布
+        var n1 = b1.name; // 背景
+        var n2 = name; // 珠子
+
+        var d0 = b0.GetComponent<RectTransform>().rect; //sizeDelta
+        var d1 = b1.GetComponent<RectTransform>().rect;
+        var d2 = GetComponent<RectTransform>().rect;
+
+        var c0 = b0.transform.localScale;
+        var c1 = b1.transform.localScale;
+        var c2 = transform.localScale;
+
+        var q0 = b0.transform.position; // 畫布
+        var q1 = b1.transform.position; // 背景
+        var q2 = transform.position; // 珠子
+
+        var p0 = b0.transform.localPosition;
+        var p1 = b1.transform.localPosition;
+        var p2 = transform.localPosition; // d = p -q // 子物件位置-父物件位置
+        Debug.Log(//" n0=" + n0 + " n1=" + n1 + 
+                  " n2=" + n2 + 
+                  "\n|position| q0=" + q0 + " q1=" + q1 + " q2=" + q2 + //世界座標位置
+                  "\n|rect| d0=" + d0 + " d1=" + d1 + " d2=" + d2 + //顯示預設UI大小 (不會隨視窗更動)
+                  "\n|localScale| c0=" + c0 + " c1=" + c1 + " c2=" + c2 +  //顯示縮放比例 (會隨視窗更動) c0重要
+                  "\n|localPosition| p0=" + p0 + " p1=" + p1 + " p2=" + p2 //相對父物件的 世界位置的差距
+                  );
     }
 
     void Update()
