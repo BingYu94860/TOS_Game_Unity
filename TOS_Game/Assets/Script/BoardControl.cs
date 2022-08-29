@@ -1,11 +1,7 @@
 using System.Collections.Generic;
-using System.Collections;
 using UnityEngine;
 using UnityEngine.UI;
-using UnityEngine.Events;
-using UnityEngine.EventSystems;
-using System.IO;
-using Assets.Script;
+
 
 public enum BoardRunStates : int { Idle, Remove, Fall };
 public class BoardControl : BoardBase
@@ -106,13 +102,13 @@ public class BoardControl : BoardBase
                 SolveBoard2.LIMIT_STEP = SolveBoard2.MAX_PATH;
                 inputFieldLimitStep.text = SolveBoard2.LIMIT_STEP.ToString();
             }
-            OrbsType[,] board = new OrbsType[TOS.ROWS, TOS.COLS];
+            BeadType[,] board = new BeadType[TOS.ROWS, TOS.COLS];
             for (int i = 0; i < TOS.ROWS; i++)
             {
                 for (int j = 0; j < TOS.COLS; j++)
                 {
                     //Debug.Log("this.board[" + i + "," + j +  "].beadType = " + this.board[i, j].beadType);
-                    board[i, j] = (OrbsType)(int)this.board[i, j].beadType;
+                    board[i, j] = (BeadType)(int)this.board[i, j].beadType;
                 }
             }
             var solveBoard = new SolveBoard2(board);
@@ -199,9 +195,9 @@ public class BoardControl : BoardBase
         board = GetBoardLinkBeads(beads, ROWS, COLS);
         // 複製 beadType
         BeadType[,] beadType2d = GetBeadType2d(board);
-        canRemove2d = FindCanRemove2d(beadType2d);
+        canRemove2d = BeadMf.FindCanRemove2d(beadType2d);
         // 計算 各combo有哪需要消除的珠子
-        List<List<(int r, int c)>> matches = FindSingleMatches(beadType2d, canRemove2d);
+        List<List<(int r, int c)>> matches = BeadMf.FindSingleMatches(beadType2d, canRemove2d);
         // 移除動畫 第幾個消除 總共多少個消除
         RemoveAnimation(board, matches, removeUnitTime);
         removeTotalTime = removeUnitTime * matches.Count;

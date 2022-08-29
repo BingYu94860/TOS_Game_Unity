@@ -9,9 +9,9 @@ public enum FingerRunStates : int { Idle, Touch, Auto };
 public class FingerObj : BeadBase
 {
     [SerializeField] FingerRunStates state = FingerRunStates.Idle;
-    public Text timerText; 
+    public Text timerText;
     public Text positionText;
-    public Text pathText; 
+    public Text pathText;
 
     #region 自動演示移動
     [SerializeField] private float autoStepTimer = 0.0f;
@@ -81,7 +81,7 @@ public class FingerObj : BeadBase
         state = FingerRunStates.Touch;
         Debug.Log("TurnStart " + beadObj.name);
         // 移動位置 & 改變起手珠色
-    
+
         SetWorldPosition(Input.mousePosition);
         beadType = beadObj.beadType;
         // 參數重置
@@ -153,8 +153,8 @@ public class FingerObj : BeadBase
         timerText.text = "剩餘時間:" + (turnMaxTime - turnTimer).ToString("00.00") + "秒";
         pathText.text = "已走 " + ((touchCount > 1) ? (touchCount - 1) : 0) + " 步";
         positionText.text = " 位置:" + (touchBeadObj != null ? "(" + touchBeadObj.init_pos.x + ", " + touchBeadObj.init_pos.y + ")" : "(?, ?)");
-        m_Slider.value = (turnMaxTime - turnTimer)/turnMaxTime;
-        
+        m_Slider.value = (turnMaxTime - turnTimer) / turnMaxTime;
+
         switch (state)
         {
             case FingerRunStates.Auto:
@@ -177,7 +177,7 @@ public class FingerObj : BeadBase
                 }
                 break;
             case FingerRunStates.Touch:
-                
+
                 SetWorldPosition(Input.mousePosition);
                 if (touchCount > 1 && turnTimer < turnMaxTime)
                 {

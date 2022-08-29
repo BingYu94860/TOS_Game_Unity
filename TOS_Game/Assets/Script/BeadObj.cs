@@ -1,9 +1,5 @@
-using System;
-using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.EventSystems;
-using UnityEngine.UI;
 
 struct BeadData // 定義需要覆寫的資料
 {
@@ -19,19 +15,6 @@ public class BeadObj : BeadBase, IPointerDownHandler, IPointerUpHandler
     [SerializeField] private BeadRunStates state;
     [SerializeField] private float timer;
     [SerializeField] private float speed;
-
-    #region 移動 (嘗試)
-    /*
-    public void moveAnimation2((int x, int y) pos)
-    {
-        timer = 0.0f;
-        state = BeadRunStates.Move;
-
-        var distPosition = GetPosition(pos.x, pos.y);
-        var moveDistance = Vector3.Distance(InitPosition, destBeadObj.InitPosition);
-    }
-    */
-    #endregion
 
     #region 移動
     [SerializeField] private float moveUnitTime; // 在 Start 設定參數
@@ -206,7 +189,7 @@ public class BeadObj : BeadBase, IPointerDownHandler, IPointerUpHandler
         var p1 = b1.transform.localPosition;
         var p2 = transform.localPosition; // d = p -q // 子物件位置-父物件位置
         Debug.Log(//" n0=" + n0 + " n1=" + n1 + 
-                  " n2=" + n2 + 
+                  " n2=" + n2 +
                   "\n|position| q0=" + q0 + " q1=" + q1 + " q2=" + q2 + //世界座標位置
                   "\n|rect| d0=" + d0 + " d1=" + d1 + " d2=" + d2 + //顯示預設UI大小 (不會隨視窗更動)
                   "\n|localScale| c0=" + c0 + " c1=" + c1 + " c2=" + c2 +  //顯示縮放比例 (會隨視窗更動) c0重要

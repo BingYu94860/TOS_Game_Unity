@@ -1,8 +1,5 @@
-using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
-
 
 public class BeadBase : MonoBehaviour
 {
@@ -10,17 +7,18 @@ public class BeadBase : MonoBehaviour
     {
         transform.position = position;
     }
-    
+
     #region 座標位置轉換定義
     public GameObject background = null;
- 
+
     public Vector3 GetPosition(int x, int y)
-    {    
+    {
         var zoom = Mathf.Min(Screen.width / 540f, Screen.height / 960f);
         Vector2 bg_wh = new Vector2(540f, 450f);
 
         Vector2 bg_wp = ((Vector2)transform.position / zoom - (Vector2)transform.localPosition) * zoom;
-        if (background != null){
+        if (background != null)
+        {
             bg_wp = (Vector2)background.transform.position;
         }
         return bg_wp - 0.5f * bg_wh * zoom + new Vector2(90f * (x + 0.5f), 90f * (y + 0.5f)) * zoom;
