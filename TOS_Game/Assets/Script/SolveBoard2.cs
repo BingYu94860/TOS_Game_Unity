@@ -60,8 +60,8 @@ class SolveBoard2
             solution.Evaluate();
             batchGroup.Add(solution);
         }
-        else
-        {//加入30個位置初始解族群
+        else //加入30個位置初始解族群
+        {
             for (var i = 0; i < ROWS; i++)
                 for (var j = 0; j < COLS; j++)
                 {
