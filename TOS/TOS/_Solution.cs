@@ -1,4 +1,144 @@
 /*
+struct Path
+{
+    public List<Direction> directions;
+    public Path() => directions = new List<Direction>();
+    public Path(List<Direction> directions) => this.directions = new List<Direction>(directions); //淺複製
+
+    public static Path operator +(Path left, Direction right)
+    {
+        left.directions.Add(right);
+        return left;
+    }
+    public override string ToString()
+    {
+        var str = "";
+        if (directions.Count > 0)
+            foreach (var dir in directions)
+                str += DirectionMf.ToString(dir);
+        return str;
+    }
+}
+
+class Solution
+{
+    public Position2 position;
+    public Solution()
+    {
+        position = new Position2();
+    }
+}
+
+struct PathDirection
+{
+    public Direction[]? dirs;
+    public PathDirection() => dirs = null;
+    public PathDirection(Direction dir) => dirs = new Direction[] { dir };
+    public static PathDirection operator +(PathDirection left, Direction right)
+    {
+        PathDirection pathDirection;
+        if (left.dirs == null)
+        {
+            pathDirection = new PathDirection(right);
+            return pathDirection;
+        }
+        else
+        {
+            pathDirection = new PathDirection() { dirs = new Direction[left.dirs.Length + 1] };
+            Array.Copy(left.dirs, pathDirection.dirs, left.dirs.Length);
+            pathDirection.dirs[^1] = right;
+            return pathDirection;
+        }
+    }
+    public override string ToString()
+    {
+        
+        if (dirs != null)
+        {
+            string v = "";
+            foreach (var dir in dirs)
+                v += DirectionMf.ToString(dir);
+            return v;
+        }
+        else return "Path Directions is Null.";
+        
+    }
+}
+
+enum BeadType : sbyte { R, B, G, L, D, H, Null };
+
+class TureBoard
+{
+    static readonly int ROWS = 5; // y
+    static readonly int COLS = 6; // x
+    private Position2 pos;
+    private readonly BeadType[,] board;
+    public TureBoard()
+    {
+        pos = new Position2(0, 0);
+        board = new BeadType[ROWS, COLS];
+    }
+    public TureBoard(Position2 pos)
+    {
+        this.pos = pos;
+        board = new BeadType[ROWS, COLS];
+    }
+    public TureBoard(Position2 pos, BeadType[,] board)
+    {
+        this.pos = pos;
+        this.board = (BeadType[,])board.Clone();
+    }
+    public void RandomBoard()
+    {
+        var randomObject = new Random();
+        for (var ir = 0; ir < ROWS; ir++)
+            for (var ic = 0; ic < COLS; ic++)
+                board[ir, ic] = (BeadType)randomObject.Next(0, (int)BeadType.Null);
+    }
+    public void MoveBoardDir(Direction dir)
+    {
+        var pos2 = pos + dir;
+        (board[pos2.row, pos2.col], board[pos.row, pos.col]) = (board[pos.row, pos.col], board[pos2.row, pos2.col]);
+        pos = pos2;
+    }
+    public bool CanMoveBoardDir(Direction dir) => Position2.InBox(Position2.Zero, pos + dir, new Position2(ROWS, COLS));
+    public bool Equal(TureBoard trueBoard)
+    {
+        //cursor
+        if (trueBoard.pos != pos) return false;
+        //board
+        for (var i = 0; i < ROWS; i++)
+            for (var j = 0; j < COLS; j++)
+                if (board[i, j] != trueBoard.board[i, j])
+                    return false;
+        return true;
+    }
+    public override string ToString()
+    {
+        string v = $"(r:{pos.row}, c:{pos.col})\n";
+        for (var ir = ROWS - 1; ir >= 0; ir--)
+        {
+            for (var ic = 0; ic < COLS; ic++)
+            {
+                v += board[ir, ic] switch
+                {
+                    BeadType.R => "R",
+                    BeadType.B => "B",
+                    BeadType.G => "G",
+                    BeadType.L => "L",
+                    BeadType.D => "D",
+                    BeadType.H => "H",
+                    _ => "_",
+                };
+            }
+            v += "\n";
+        }
+        return v;
+    }
+}
+*/
+
+/*
 using System;
 using System.Collections.Generic;
 

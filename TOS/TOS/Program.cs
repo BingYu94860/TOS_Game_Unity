@@ -5,6 +5,24 @@ using System.Runtime.CompilerServices;
 enum Direction : short { Right, RightDown, Down, LeftDown, Left, LeftUp, Up, RightUp, Stop };
 
 class DirectionMf {
+    public static Direction[] ModeDir4 = 
+    {
+        Direction.Right,
+        Direction.Down,
+        Direction.Left,
+        Direction.Up
+    };
+    public static Direction[] ModeDir8 =
+    {
+        Direction.Right,
+        Direction.RightDown,
+        Direction.Down,
+        Direction.LeftDown,
+        Direction.Left,
+        Direction.LeftUp,
+        Direction.Up,
+        Direction.RightUp
+    };
     public static short RowVector(Direction dir) => dir switch
     {   // Up : +1 // Down : -1
         Direction.LeftUp => 1,
@@ -65,8 +83,12 @@ class DirectionMf {
 
 struct Position2
 {
+    #region 成員
     public short row; // y
     public short col; // x
+    #endregion
+
+    #region 建構子
     public Position2()
     {
         row = 0;
@@ -82,6 +104,9 @@ struct Position2
         row = DirectionMf.RowVector(dir);
         col = DirectionMf.ColVector(dir);
     }
+    #endregion
+
+    #region 常數
     public static Position2 Zero => new(0, 0);
     public static Position2 Right => new(Direction.Right);
     public static Position2 RightDown => new(Direction.RightDown);
@@ -91,6 +116,9 @@ struct Position2
     public static Position2 LeftUp => new(Direction.LeftUp);
     public static Position2 Up => new(Direction.Up);
     public static Position2 RightUp => new(Direction.RightUp);
+    #endregion
+
+    #region 運算操作
     public static Position2 operator +(Position2 left, Position2 right) => new()
     {
         row = (short)(left.row + right.row),
@@ -111,8 +139,6 @@ struct Position2
         row = (short)(left.row - DirectionMf.RowVector(right)),
         col = (short)(left.col - DirectionMf.ColVector(right))
     };
-    public override string ToString() => $"(r:{row}, c:{col})";
-    public static bool InBox(Position2 leftDown, Position2 pos, Position2 rightUp) => pos >= leftDown && pos < rightUp;
     public static bool operator >=(Position2 left, Position2 right) => left.row >= right.row && left.col >= right.col;
     public static bool operator <=(Position2 left, Position2 right) => left.row <= right.row && left.col <= right.col;
     public static bool operator >(Position2 left, Position2 right) => left.row > right.row && left.col > right.col;
@@ -121,99 +147,107 @@ struct Position2
     public static bool operator !=(Position2 left, Position2 right) => left.row != right.row || left.col != right.col;
     public override bool Equals([NotNullWhen(true)] object? obj) => obj is not null && this == (Position2)obj;
     public override int GetHashCode() => HashCode.Combine(row, col);
-}
+    #endregion
 
-//----------------------------------------------------------------------------------------------------------
+    public static bool InBox(Position2 leftDown, Position2 pos, Position2 rightUp) => pos >= leftDown && pos < rightUp;
+
+    public override string ToString() => $"(r:{row}, c:{col})";
+}
 
 struct Path
 {
-    public List<Direction> directions;
-    public Path() => directions = new List<Direction>();
-    public Path(List<Direction> directions) => this.directions = new List<Direction>(directions); //淺複製
+    #region 成員
+    public Direction[] dirs;
+    #endregion
 
+    #region 建構子
+    public Path() => dirs = Array.Empty<Direction>();
+    public Path(Direction dir) => dirs = new Direction[] { dir };
+    #endregion
+
+    #region 常數
+    public static Path Empty => new();
+    #endregion
+
+    #region 運算操作
     public static Path operator +(Path left, Direction right)
     {
-        left.directions.Add(right);
-        return left;
+        Path path = new() { dirs = new Direction[left.dirs.Length + 1] };
+        Array.Copy(left.dirs, path.dirs, left.dirs.Length);
+        path.dirs[^1] = right;
+        return path;
     }
+    #endregion
+
     public override string ToString()
     {
         var str = "";
-        if (directions.Count > 0)
-            foreach (var dir in directions)
+        if (dirs.Length > 0)
+            foreach (var dir in dirs)
                 str += DirectionMf.ToString(dir);
         return str;
     }
 }
-
-class Solution
+//----------------------------------------------------------------------------------------------------------
+class TurnPath
 {
-    public Position2 position;
-    public Solution()
+    #region 成員
+    protected Position2 pos;
+    protected Path path;
+    #endregion
+
+    #region 建構子
+    public TurnPath()
     {
-        position = new Position2();
+        pos = new Position2();
+        path = new Path();
     }
+    public TurnPath(int row, int col)
+    {
+        pos = new Position2(row, col);
+        path = new Path();
+    }
+    #endregion
+
+    public virtual void MoveDir(Direction dir)
+    {
+        pos += dir;
+        path += dir;
+    }
+    public override string ToString() => $"(r:{pos.row}, c:{pos.col}) p:{path}\n";
+}
+enum BeadType : short { R, B, G, L, D, H, Null };
+
+class BeadTypeMf
+{
+    public static string ToString(BeadType type) => type switch
+    {
+        BeadType.R => "R",
+        BeadType.B => "B",
+        BeadType.G => "G",
+        BeadType.L => "L",
+        BeadType.D => "D",
+        BeadType.H => "H",
+        _ => "_"
+    };
 }
 
-struct PathDirection
+class TurnBoard: TurnPath
 {
-    public Direction[]? dirs;
-    public PathDirection() => dirs = null;
-    public PathDirection(Direction dir) => dirs = new Direction[] { dir };
-    public static PathDirection operator +(PathDirection left, Direction right)
-    {
-        PathDirection pathDirection;
-        if (left.dirs == null)
-        {
-            pathDirection = new PathDirection(right);
-            return pathDirection;
-        }
-        else
-        {
-            pathDirection = new PathDirection() { dirs = new Direction[left.dirs.Length + 1] };
-            Array.Copy(left.dirs, pathDirection.dirs, left.dirs.Length);
-            pathDirection.dirs[^1] = right;
-            return pathDirection;
-        }
-    }
-    public override string ToString()
-    {
-        
-        if (dirs != null)
-        {
-            string v = "";
-            foreach (var dir in dirs)
-                v += DirectionMf.ToString(dir);
-            return v;
-        }
-        else return "Path Directions is Null.";
-        
-    }
-}
+    #region 靜態常數
+    public static int ROWS = 5; // y
+    public static int COLS = 6; // x
+    #endregion
 
-enum BeadType : sbyte { R, B, G, L, D, H, Null };
+    #region 成員
+    protected BeadType[,] board;
+    #endregion
 
-class TureBoard
-{
-    static readonly int ROWS = 5; // y
-    static readonly int COLS = 6; // x
-    private Position2 pos;
-    private readonly BeadType[,] board;
-    public TureBoard()
-    {
-        pos = new Position2(0, 0);
-        board = new BeadType[ROWS, COLS];
-    }
-    public TureBoard(Position2 pos)
-    {
-        this.pos = pos;
-        board = new BeadType[ROWS, COLS];
-    }
-    public TureBoard(Position2 pos, BeadType[,] board)
-    {
-        this.pos = pos;
-        this.board = (BeadType[,])board.Clone();
-    }
+    #region 建構子
+    public TurnBoard() : base() => board = new BeadType[ROWS, COLS];
+    public TurnBoard(int row, int col) : base(row, col) => board = new BeadType[ROWS, COLS];
+    #endregion
+
     public void RandomBoard()
     {
         var randomObject = new Random();
@@ -221,110 +255,184 @@ class TureBoard
             for (var ic = 0; ic < COLS; ic++)
                 board[ir, ic] = (BeadType)randomObject.Next(0, (int)BeadType.Null);
     }
-    public void MoveBoardDir(Direction dir)
+
+    public void SetPosition(int row, int col)
     {
-        var pos2 = pos + dir;
-        (board[pos2.row, pos2.col], board[pos.row, pos.col]) = (board[pos.row, pos.col], board[pos2.row, pos2.col]);
-        pos = pos2;
+        pos.row = (short)row;
+        pos.col = (short)col;
     }
-    public bool CanMoveBoardDir(Direction dir) => Position2.InBox(Position2.Zero, pos + dir, new Position2(ROWS, COLS));
-    public bool Equal(TureBoard trueBoard)
+
+    public bool CanMoveDir(Direction dir) => Position2.InBox(Position2.Zero, pos + dir, new Position2(ROWS, COLS));
+
+    public override void MoveDir(Direction dir)
     {
-        //cursor
-        if (trueBoard.pos != pos) return false;
-        //board
-        for (var i = 0; i < ROWS; i++)
-            for (var j = 0; j < COLS; j++)
-                if (board[i, j] != trueBoard.board[i, j])
-                    return false;
-        return true;
+        var odd = pos;
+        base.MoveDir(dir);
+        (board[odd.row, odd.col], board[pos.row, pos.col]) = (board[pos.row, pos.col], board[odd.row, odd.col]);
     }
+
     public override string ToString()
     {
-        string v = $"(r:{pos.row}, c:{pos.col})\n";
+        string str = $"(r:{pos.row}, c:{pos.col}) p:{path}\n";
         for (var ir = ROWS - 1; ir >= 0; ir--)
         {
             for (var ic = 0; ic < COLS; ic++)
-            {
-                v += board[ir, ic] switch
-                {
-                    BeadType.R => "R",
-                    BeadType.B => "B",
-                    BeadType.G => "G",
-                    BeadType.L => "L",
-                    BeadType.D => "D",
-                    BeadType.H => "H",
-                    _ => "_",
-                };
-            }
-            v += "\n";
+                str += BeadTypeMf.ToString(board[ir, ic]);
+            str += "\n";
         }
-        return v;
+        return str;
     }
 }
 
+class Solution: TurnBoard
+{
+    //public TurnBoard init;
+
+    public float weight;
+    public short bestPathLength;
+    public float beforeBestWeight;
+
+    #region 建構式
+    public Solution() : base()
+    {
+        weight = 0f;
+        bestPathLength = 0;
+        beforeBestWeight = 0f;
+    }
+
+    /*
+    public Solution(BeadType[,] init_board, int row, int col)
+    {
+        init = new TurnBoard(ref init_board, row, col);
+        turn = init.Copy();
+        path = Array.Empty<Direction>();//(空)
+        weight = 0f;
+        bestPathLength = 0;
+        beforeBestWeight = 0f;
+    }
+    public Solution(Solution solution)
+    {
+        init = solution.init;
+        turn = solution.turn.Copy();
+        path = solution.path;
+        weight = 0f;
+        bestPathLength = solution.bestPathLength;
+        beforeBestWeight = solution.beforeBestWeight;
+    }
+    */
+    #endregion
+
+    #region 判斷是否是可以移動的方向 還有限制條件
+    /*
+    public bool CanMoveTurnDir(Direction dir)
+    {
+        //不為空&&不能反向
+        if (path.Length > 0 && path[path.Length - 1] == DirectionMf.Inverse(dir))
+            return false;
+        //不能超出邊界
+        if (!turn.CanMoveDir(dir))
+            return false;
+        //不能與過去狀態相同
+        var nextBoard = turn.Copy();
+        nextBoard.MoveBoardDir(dir);
+        var beforeBoard = turn.Copy();
+        for (var i = path.Length - 1; i >= 0; i--)
+        {
+            var idir = path[i];
+            beforeBoard.MoveBoardDir(DirectionMf.Inverse(idir));
+            if (beforeBoard.Equal(nextBoard))
+                return false;
+        }
+        return true;
+    }
+    */
+    #endregion
+
+    #region 移動1個方向
+    /*
+    public void MoveTurnDir(Direction dir)
+    {
+        turn.MoveDir(dir);
+        //path add
+        var new_path = new Direction[path.Length + 1];
+        Array.Copy(path, new_path, path.Length);
+        path = new_path;
+        path[^1] = dir;//add
+    }
+    */
+    #endregion
+
+    #region 計算解的評分
+    public void Evaluate() { }
+    #endregion
+
+    #region 產生下1步的解
+    /*
+    public List<Solution> NextStepSolutions()
+    {
+        var solutions = new List<Solution>();
+        foreach (var dir in DirectionMf.ModeDir4)
+        {
+            if (CanMoveTurnDir(dir))
+            {
+                var solution = new Solution(this);
+                solution.MoveTurnDir(dir);
+                solution.Evaluate();
+                if (solution.weight > beforeBestWeight)
+                {
+                    solution.beforeBestWeight = solution.weight;
+                    solution.bestPathLength = (sbyte)solution.path.Length;
+                }
+                solutions.Add(solution);
+            }
+        }
+        return solutions;
+    }
+    */
+    #endregion
+
+    #region 得到路徑字串
+    /*
+    public String GetPathString()
+    {
+        if (path.Length <= 0)
+            return "Empty";
+        var pathString = "";
+        foreach (var dir in path)
+            pathString += DirectionMf.ToString(dir);
+        return pathString;
+    }
+    */
+    #endregion
+}
 
 class Program
 {
     private static void Main(string[] args)
     {
-        Console.WriteLine(Position2.Zero);
         Console.WriteLine("Hello, World!");
 
-        var pp = new Path();
-        Console.WriteLine(pp);
-        pp += Direction.Right;
-        Console.WriteLine(pp);
+        TurnBoard turnBoard = new();
+        turnBoard.RandomBoard();
+        turnBoard.SetPosition(0, 1);
+        Console.WriteLine(turnBoard);
 
-        var path = new PathDirection();
-        Console.WriteLine(path);
-        path += Direction.Up;
-        Console.WriteLine(path);
-        path += Direction.Down;
-        Console.WriteLine(path);
+        //var path = Path.Empty + Direction.Right + Direction.Right + Direction.Right + Direction.Right + Direction.Right;
 
-        //var board = new BeadType[6, 5];
-        
-        var x = new Position2(5, 1) + Position2.Up;
-        var p = new Position2(0, 0);
-        var q = new Position2(5, 6);
+        Direction[] dirs =
+        {
+            Direction.Right,
+            Direction.Left,
+            Direction.Right,
+            Direction.Up,
+            Direction.Right
+        };
 
-        var y = p + q;
-        Console.WriteLine(y);
-        Console.WriteLine(y + Direction.Left);
-        Console.WriteLine(x <= q);
-        
-
-        var tureBoard = new TureBoard();
-        tureBoard.RandomBoard();
-        var dir = Direction.Up;
-        Console.WriteLine(tureBoard);
-        Console.WriteLine(tureBoard.CanMoveBoardDir(dir));
-        if (tureBoard.CanMoveBoardDir(dir))
-            tureBoard.MoveBoardDir(dir);
-        Console.WriteLine(tureBoard);
-
-
-        var s = new Vector2();
+        foreach (var dir in dirs)
+        {
+            if (turnBoard.CanMoveDir(dir))
+                turnBoard.MoveDir(dir);
+            Console.WriteLine(turnBoard);
+        }
     }
 }
-
-
-
-
-
-
-//Console.WriteLine(TOS.ROWS);
-
-
-// Board
-
-/*
- Board
-
- row : int // y = 0 ~ 4
- col : int // x = 0 ~ 5
- BeadType[,]
- 
- 
- */
