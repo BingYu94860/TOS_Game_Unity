@@ -1,0 +1,15 @@
+C:\Users\user\Documents\GitHub\TOS_Game_Unity\TOS\TOS\bin\Debug\net6.0\TOS.exe
+C:\Users\user\Documents\GitHub\TOS_Game_Unity\TOS\TOS\bin\Debug\net6.0\TOS.deps.json
+C:\Users\user\Documents\GitHub\TOS_Game_Unity\TOS\TOS\bin\Debug\net6.0\TOS.runtimeconfig.json
+C:\Users\user\Documents\GitHub\TOS_Game_Unity\TOS\TOS\bin\Debug\net6.0\TOS.dll
+C:\Users\user\Documents\GitHub\TOS_Game_Unity\TOS\TOS\bin\Debug\net6.0\TOS.pdb
+C:\Users\user\Documents\GitHub\TOS_Game_Unity\TOS\TOS\obj\Debug\net6.0\TOS.csproj.AssemblyReference.cache
+C:\Users\user\Documents\GitHub\TOS_Game_Unity\TOS\TOS\obj\Debug\net6.0\TOS.GeneratedMSBuildEditorConfig.editorconfig
+C:\Users\user\Documents\GitHub\TOS_Game_Unity\TOS\TOS\obj\Debug\net6.0\TOS.AssemblyInfoInputs.cache
+C:\Users\user\Documents\GitHub\TOS_Game_Unity\TOS\TOS\obj\Debug\net6.0\TOS.AssemblyInfo.cs
+C:\Users\user\Documents\GitHub\TOS_Game_Unity\TOS\TOS\obj\Debug\net6.0\TOS.csproj.CoreCompileInputs.cache
+C:\Users\user\Documents\GitHub\TOS_Game_Unity\TOS\TOS\obj\Debug\net6.0\TOS.dll
+C:\Users\user\Documents\GitHub\TOS_Game_Unity\TOS\TOS\obj\Debug\net6.0\refint\TOS.dll
+C:\Users\user\Documents\GitHub\TOS_Game_Unity\TOS\TOS\obj\Debug\net6.0\TOS.pdb
+C:\Users\user\Documents\GitHub\TOS_Game_Unity\TOS\TOS\obj\Debug\net6.0\TOS.genruntimeconfig.cache
+C:\Users\user\Documents\GitHub\TOS_Game_Unity\TOS\TOS\obj\Debug\net6.0\ref\TOS.dll
