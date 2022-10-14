@@ -1,9 +1,21 @@
 ﻿using System.Diagnostics.CodeAnalysis;
 using System.Numerics;
 using System.Runtime.CompilerServices;
-
+enum BeadType : short { R, B, G, L, D, H, Null };
+class BeadTypeMf
+{
+    public static string ToString(BeadType type) => type switch
+    {
+        BeadType.R => "R",
+        BeadType.B => "B",
+        BeadType.G => "G",
+        BeadType.L => "L",
+        BeadType.D => "D",
+        BeadType.H => "H",
+        _ => "_"
+    };
+}
 enum Direction : short { Right, RightDown, Down, LeftDown, Left, LeftUp, Up, RightUp, Stop };
-
 class DirectionMf {
     public static Direction[] ModeDir4 = 
     {
@@ -189,50 +201,7 @@ struct Path
     }
 }
 //----------------------------------------------------------------------------------------------------------
-class TurnPath
-{
-    #region 成員
-    protected Position2 pos;
-    protected Path path;
-    #endregion
-
-    #region 建構子
-    public TurnPath()
-    {
-        pos = new Position2();
-        path = new Path();
-    }
-    public TurnPath(int row, int col)
-    {
-        pos = new Position2(row, col);
-        path = new Path();
-    }
-    #endregion
-
-    public virtual void MoveDir(Direction dir)
-    {
-        pos += dir;
-        path += dir;
-    }
-    public override string ToString() => $"(r:{pos.row}, c:{pos.col}) p:{path}\n";
-}
-enum BeadType : short { R, B, G, L, D, H, Null };
-
-class BeadTypeMf
-{
-    public static string ToString(BeadType type) => type switch
-    {
-        BeadType.R => "R",
-        BeadType.B => "B",
-        BeadType.G => "G",
-        BeadType.L => "L",
-        BeadType.D => "D",
-        BeadType.H => "H",
-        _ => "_"
-    };
-}
-
-class TurnBoard: TurnPath
+class TurnBoard
 {
     #region 靜態常數
     public static int ROWS = 5; // y
@@ -241,11 +210,21 @@ class TurnBoard: TurnPath
 
     #region 成員
     protected BeadType[,] board;
+    protected Position2 pos;
+    protected Path path;
     #endregion
 
     #region 建構子
-    public TurnBoard() : base() => board = new BeadType[ROWS, COLS];
-    public TurnBoard(int row, int col) : base(row, col) => board = new BeadType[ROWS, COLS];
+    public TurnBoard() { 
+        board = new BeadType[ROWS, COLS];
+        pos = new Position2();
+        path = new Path();
+    }
+    public TurnBoard(int row, int col) {
+        board = new BeadType[ROWS, COLS];
+        pos = new Position2(row, col);
+        path = new Path();
+    }
     #endregion
 
     public void RandomBoard()
@@ -256,18 +235,15 @@ class TurnBoard: TurnPath
                 board[ir, ic] = (BeadType)randomObject.Next(0, (int)BeadType.Null);
     }
 
-    public void SetPosition(int row, int col)
-    {
-        pos.row = (short)row;
-        pos.col = (short)col;
-    }
+    public void SetPosition(int row, int col) => pos = new Position2(row, col);
 
     public bool CanMoveDir(Direction dir) => Position2.InBox(Position2.Zero, pos + dir, new Position2(ROWS, COLS));
 
-    public override void MoveDir(Direction dir)
+    public void MoveDir(Direction dir)
     {
         var odd = pos;
-        base.MoveDir(dir);
+        pos += dir;
+        path += dir;
         (board[odd.row, odd.col], board[pos.row, pos.col]) = (board[pos.row, pos.col], board[odd.row, odd.col]);
     }
 
@@ -284,126 +260,8 @@ class TurnBoard: TurnPath
     }
 }
 
-class Solution: TurnBoard
+class Solution
 {
-    //public TurnBoard init;
-
-    public float weight;
-    public short bestPathLength;
-    public float beforeBestWeight;
-
-    #region 建構式
-    public Solution() : base()
-    {
-        weight = 0f;
-        bestPathLength = 0;
-        beforeBestWeight = 0f;
-    }
-
-    /*
-    public Solution(BeadType[,] init_board, int row, int col)
-    {
-        init = new TurnBoard(ref init_board, row, col);
-        turn = init.Copy();
-        path = Array.Empty<Direction>();//(空)
-        weight = 0f;
-        bestPathLength = 0;
-        beforeBestWeight = 0f;
-    }
-    public Solution(Solution solution)
-    {
-        init = solution.init;
-        turn = solution.turn.Copy();
-        path = solution.path;
-        weight = 0f;
-        bestPathLength = solution.bestPathLength;
-        beforeBestWeight = solution.beforeBestWeight;
-    }
-    */
-    #endregion
-
-    #region 判斷是否是可以移動的方向 還有限制條件
-    /*
-    public bool CanMoveTurnDir(Direction dir)
-    {
-        //不為空&&不能反向
-        if (path.Length > 0 && path[path.Length - 1] == DirectionMf.Inverse(dir))
-            return false;
-        //不能超出邊界
-        if (!turn.CanMoveDir(dir))
-            return false;
-        //不能與過去狀態相同
-        var nextBoard = turn.Copy();
-        nextBoard.MoveBoardDir(dir);
-        var beforeBoard = turn.Copy();
-        for (var i = path.Length - 1; i >= 0; i--)
-        {
-            var idir = path[i];
-            beforeBoard.MoveBoardDir(DirectionMf.Inverse(idir));
-            if (beforeBoard.Equal(nextBoard))
-                return false;
-        }
-        return true;
-    }
-    */
-    #endregion
-
-    #region 移動1個方向
-    /*
-    public void MoveTurnDir(Direction dir)
-    {
-        turn.MoveDir(dir);
-        //path add
-        var new_path = new Direction[path.Length + 1];
-        Array.Copy(path, new_path, path.Length);
-        path = new_path;
-        path[^1] = dir;//add
-    }
-    */
-    #endregion
-
-    #region 計算解的評分
-    public void Evaluate() { }
-    #endregion
-
-    #region 產生下1步的解
-    /*
-    public List<Solution> NextStepSolutions()
-    {
-        var solutions = new List<Solution>();
-        foreach (var dir in DirectionMf.ModeDir4)
-        {
-            if (CanMoveTurnDir(dir))
-            {
-                var solution = new Solution(this);
-                solution.MoveTurnDir(dir);
-                solution.Evaluate();
-                if (solution.weight > beforeBestWeight)
-                {
-                    solution.beforeBestWeight = solution.weight;
-                    solution.bestPathLength = (sbyte)solution.path.Length;
-                }
-                solutions.Add(solution);
-            }
-        }
-        return solutions;
-    }
-    */
-    #endregion
-
-    #region 得到路徑字串
-    /*
-    public String GetPathString()
-    {
-        if (path.Length <= 0)
-            return "Empty";
-        var pathString = "";
-        foreach (var dir in path)
-            pathString += DirectionMf.ToString(dir);
-        return pathString;
-    }
-    */
-    #endregion
 }
 
 class Program
